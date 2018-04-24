@@ -1,11 +1,10 @@
 var igricaZmijica = {
     visinaTabele: 5,
-    sirinaTabele: 5,
-    pocetnaPozicija: [[1, 3], [1, 2], [1, 1]],
-    zmija: this.pocetnaPozicija,
+    sirinaTabele: 15,
+    zmija: [[1, 3], [1, 2], [1, 1]],
     trenutniSmer: 'desno',
-    smer: this.trenutniSmer,
-    pauzirano: "false",
+    smer: "desno",
+    pauzirano: false,
     tabela: [],
     food: [],
     poeni: 0,
@@ -32,7 +31,7 @@ var igricaZmijica = {
         var vertikala = zmija[0][0],
             horizontala = zmija[0][1];
 
-        if (pauzirano == true) {
+        if (this.pauzirano == true) {
             return zmija;
         } else {
             if (trenutniSmer == "levo") {
@@ -62,30 +61,33 @@ var igricaZmijica = {
         }
     },
 
+    pokreciIgru: function () {
+        this.nacrtajIgru();
+        this.tabela[this.food[0]][this.food[1]] = this.hrana;
+        this.trenutniSmer = this.smer;
+        if (this.daLiJePreslaPrekoSebe() || this.daLiJeUdarilaZid()) {
+            this.smanjiZivote(pokreniZmiju, pokreniVreme);
+            this.zmija = [[1, 3], [1, 2], [1, 1]];
+            this.trenutniSmer = "desno";
+            this.smer = "desno";
+        } else {
+            this.zmija = this.kretanje(this.trenutniSmer, this.zmija);
+        }
+        this.postaviZmijuNaTabelu();
+        this.ispisNaStranici(this.tabela, 20);
+        this.daLiJePojela();
+        this.azurirajStatuse();
+    },
+
+    pokreciVreme: function () {
+        if (!this.pauzirano) this.vreme++;
+    },
+
     pokreniIgru: function () {
         this.nacrtajIgru();
         this.postaviHranu();
-        var pokreniZmiju = setInterval(function () {
-            this.nacrtajIgru();
-            this.tabela[this.food[0]][this.food[1]] = this.hrana;
-            this.trenutniSmer = this.smer;
-            if (this.daLiJePreslaPrekoSebe() || this.daLiJeUdarilaZid()) {
-                this.smanjiZivote(pokreniZmiju, pokreniVreme);
-                this.zmija = this.pocetnaPozicija;
-                this.trenutniSmer = "desno";
-                this.smer = this.trenutniSmer;
-            } else {
-                this.zmija = this.kretanje(this.trenutniSmer, this.zmija);
-            }
-            this.postaviZmijuNaTabelu();
-            this.ispisNaStranici(this.tabela, 20);
-            this.daLiJePojela();
-            this.azurirajStatuse();
-        }, 500);
-        var pokreniVreme = setInterval(function () {
-            if (!this.pauzirano) this.vreme++;
-        }, 1000);
-
+        var pokreniZmiju = setInterval(this.pokreciIgru.bind(this), 500);
+        var pokreniVreme = setInterval(this.pokreciVreme.bind(this), 1000);
     },
 
     pauzirajIgru: function (event) {
@@ -162,7 +164,7 @@ var igricaZmijica = {
     },
 
     povecajZmijicu: function () {
-        this.zmija.push(food);
+        this.zmija.push(this.food);
     },
 
     promeniSmer: function (event) {
