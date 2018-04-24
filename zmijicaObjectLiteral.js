@@ -13,6 +13,8 @@ var igricaZmijica = {
     praznoPolje: 0,
     zmijica: 1,
     hrana: 2,
+    pokreniZmiju: 0,
+    pokreniVreme: 0,
 
     postaviZmijuNaTabelu: function () {
         for (var deoZmije = 0; deoZmije < this.zmija.length; deoZmije++) {
@@ -66,7 +68,7 @@ var igricaZmijica = {
         this.tabela[this.food[0]][this.food[1]] = this.hrana;
         this.trenutniSmer = this.smer;
         if (this.daLiJePreslaPrekoSebe() || this.daLiJeUdarilaZid()) {
-            this.smanjiZivote(pokreniZmiju, pokreniVreme);
+            this.smanjiZivote(this.pokreniZmiju, this.pokreniVreme);
             this.zmija = [[1, 3], [1, 2], [1, 1]];
             this.trenutniSmer = "desno";
             this.smer = "desno";
@@ -86,8 +88,8 @@ var igricaZmijica = {
     pokreniIgru: function () {
         this.nacrtajIgru();
         this.postaviHranu();
-        var pokreniZmiju = setInterval(this.pokreciIgru.bind(this), 500);
-        var pokreniVreme = setInterval(this.pokreciVreme.bind(this), 1000);
+        this.pokreniZmiju = setInterval(this.pokreciIgru.bind(this), 500);
+        this.pokreniVreme = setInterval(this.pokreciVreme.bind(this), 1000);
     },
 
     pauzirajIgru: function (event) {
@@ -212,11 +214,13 @@ var igricaZmijica = {
     pustiZvukJednom: function (parametar) {
         oneSound = new Audio(parametar);
         oneSound.play();
+    },
+    
+    initEvents: function () {
+        document.body.addEventListener("keydown", this.promeniSmer.bind(this));
+        document.body.addEventListener("keydown", this.pauzirajIgru.bind(this));
     }
 
 };
-
-document.body.addEventListener("keydown", igricaZmijica.promeniSmer);
-document.body.addEventListener("keydown", igricaZmijica.pauzirajIgru);
-//igricaZmijica.nacrtajIgru();
+igricaZmijica.initEvents();
 igricaZmijica.pokreniIgru();
